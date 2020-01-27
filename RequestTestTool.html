@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ja">
+<header>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <style>
+        .title{
+            font-size: 32px;
+            font-weight: bold;
+            margin-left: 1.2em;
+        }
+        .subtitle{
+            margin-left: .6em;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .subtitle:before{
+            content: "-";
+            margin-right: .5em;
+        }
+        #url{
+            font-size: 18px;
+            width: 70%;
+            background-color: #fff;
+            padding: 1em;
+            border: #687a6e solid 2px;
+            outline: none;
+            margin: .5em 0 2em 2em;
+        }
+        #method{
+            margin: .8em 2em 1em 2em;
+            padding: .8em .8em .8em 2em;
+            height: 2.8em;
+            width: 7.8em;
+            font-size: 18px;
+            border: #687a6e solid 2px;
+            outline: none;
+            color: #253b2d;
+        }
+        .explain{
+            display: inline-block;
+            width: 3.6em;
+            margin-right: .8em;
+            text-align: center;
+            font-weight: bold;
+            background-color: #687a6e;
+            color: #fff;
+            padding: .4em;
+            user-select: none;
+            border-radius: 5px;
+        }
+        .form{
+            width: 7em;
+            height: 2em;
+            padding: .4em;
+            text-align: center;
+            margin: .3em 0;
+            font-size: 18px;
+            border: 2px solid #687a6e;
+            outline: none;
+        }
+        .query{
+            margin-left: 2em;
+            display: inline-block;
+            border: solid 2px #687a6e;
+            padding: 1.5em;
+            position: relative;
+            width: 19em;
+            margin-bottom: .5em;
+        }
+        .close{
+            border-radius: 5px;
+            padding: .6em;
+            position: absolute;
+            height: calc(100% - 50px);
+            bottom: 25px; right: 20px;
+            width: 3em;
+            color: white;
+            background-color: #687a6e;
+            border: none;
+            outline: none;
+            font-size: 18px;
+        }
+
+        .close:hover{
+            background-color: #f78f8b;
+            cursor: pointer;
+        }
+        .send{
+            font-size: 18px;
+            height: 3.4em;
+            width: 5em;
+            border: #687a6e solid 2px;
+            background-color: #687a6e;
+            color: white;
+            outline: none;
+        }
+        .send:hover{
+            background-color: #f78f8b;
+            border: #f78f8b solid 2px;
+            cursor: pointer;
+        }
+        .add{
+            width: 15em;
+            height: 4em;
+            font-size: 18px;
+            color: white;
+            outline: none;
+            background-color: #687a6e;
+            border: none;
+            text-align: center;
+            margin: .2em 0 0 2em;
+        }
+        .add:hover{
+            background-color: #f78f8b;
+            cursor: pointer;
+        }
+    </style>
+</header>
+    <div id="app">
+        <p class="title">GET・POST Request Test Tool!!</p>
+
+        <div class="group">
+            <label class="subtitle">Request URL</label><br>
+            <input id="url" type="text" v-model="url" placeholder="Please Enter URL" spellcheck="false">
+            <button class="send" v-on:click="send">SEND</button>
+         </div>
+
+         <div class="group">
+            <label for="method" class="subtitle">Request Method</label><br>
+            <select id="method">
+                <option v-for="method in request">{{ method }}</option>
+            </select>
+        </div>
+            
+        <p class="subtitle">Query String</p>
+        <div class="query" v-for="(q,index) in query">
+            <div>
+                <a class="explain">Key</a>
+                <input id="key" class="form" type="text" v-model="q.key" :value="q.key" spellcheck="false">
+            </div>
+            <div>
+                <a class="explain">Param</a>
+                <input id="param" class="form" type="text" v-model="q.param" :value="q.param" spellcheck="false">
+            </div>
+            <button class="close" v-on:click="del(index)">×</button>
+        </div>
+        <button class="add" v-on:click="add">new</button>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data:{
+                url: 'http://localhost:8080/',
+                request:[
+                    'GET','POST'
+                ],
+                query:[
+                ]
+            },
+            methods:{
+                add: function(){
+                    this.query.push({key:'',param:''});
+                },
+                del: function(index){
+                    this.query.splice(index,1);
+                },
+                send: function(){
+
+                    if(this.url == ''){
+                        alert('URLを入力してください')
+                        return null
+                    }
+
+                    var form = document.createElement('form');
+                    form.charset = 'UTF-8';
+                    form.action = this.url;
+
+                    var i = document.getElementById('method').selectedIndex;
+                    if(i)
+                        form.method = 'post';
+                    else
+                        form.method = 'get';
+                    
+                    document.body.appendChild(form);
+                    for(var i=0;i<this.query.length;i++){
+                        var child = document.createElement("input");
+                        child.name = this.query[i].key;
+                        child.value = this.query[i].param;
+                        form.appendChild(child);
+                    }
+                    form.submit();
+                }
+            }
+        })
+    </script>
+</body>
+</html>
